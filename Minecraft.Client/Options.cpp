@@ -234,6 +234,10 @@ void Options::set(const Options::Option *item, float fVal)
 	{
 		fov = fVal;
 	}
+	//if (item == Option::CHUNK_ALLOCATED_MEM)
+	//{
+		//chunk-memory TODO saves it
+	//}
 	if (item == Option::GAMMA)
 	{
 		gamma = fVal;
@@ -438,6 +442,7 @@ void Options::load()
                 if (cmds[0] == L"sound") sound = readFloat(cmds[1]);
                 if (cmds[0] == L"mouseSensitivity") sensitivity = readFloat(cmds[1]);
 				if (cmds[0] == L"fov") fov = readFloat(cmds[1]);
+				//if (cmds[0] == L"chunkLoaderMem") fov = readFloat(cmds[1]); //chunk-memory TODO reads it
 				if (cmds[0] == L"gamma") gamma = readFloat(cmds[1]);
                 if (cmds[0] == L"invertYMouse") invertYMouse = cmds[1]==L"true";
                 if (cmds[0] == L"viewDistance") viewDistance = _fromString<int>(cmds[1]);

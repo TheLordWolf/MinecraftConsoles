@@ -31,6 +31,7 @@ public:
 		static const Option *GUI_SCALE;
 		static const Option *FOV;
 		static const Option *GAMMA;
+         //static const Option *CHUNK_ALLOCATED_MEM; //chunk-memory TODO reads it 
 		static const Option *RENDER_CLOUDS;
 		static const Option *PARTICLES;
 

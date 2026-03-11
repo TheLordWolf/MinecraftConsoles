@@ -106,6 +106,7 @@ public:
 	void tileChanged(int x, int y, int z);
 	void tileLightChanged(int x, int y, int z);
 	void setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1, Level *level);	// 4J - added level param
+	void setMaxMemory(unsigned int max);
 
 #ifdef __PS3__
 	void cull_SPU(int playerIndex, Culler *culler, float a);
@@ -166,6 +167,8 @@ private:
 	double xOld[4];						// 4J - now one per player
 	double yOld[4];						// 4J - now one per player
 	double zOld[4];						// 4J - now one per player
+
+	int maxAllocatedMemory = 1024;
 
 	int totalChunks, offscreenChunks, occludedChunks, renderedChunks, emptyChunks;
 	static const int RENDERLISTS_LENGTH = 4;		// 4J - added

@@ -1852,8 +1852,10 @@ bool LevelRenderer::updateDirtyChunks()
 	throttle++;
 	*/
 	PIXAddNamedCounter(static_cast<float>(memAlloc)/(1024.0f*1024.0f),"Command buffer allocations");
-	bool onlyRebuild = ( memAlloc >= MAX_COMMANDBUFFER_ALLOCATIONS );
+	bool onlyRebuild = ( memAlloc >= this->maxAllocatedMemory );
 	EnterCriticalSection(&m_csDirtyChunks);
+	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxAllocatedMemory /1024/1024) + "\n\n";
+	app.DebugPrintf(str.c_str());
 
 	// Move any dirty chunks stored in the lock free stack into global flags
 	int index = 0;
@@ -2442,6 +2444,12 @@ void LevelRenderer::tileLightChanged(int x, int y, int z)
 void LevelRenderer::setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1, Level *level)	// 4J - added level param
 {
 	setDirty(x0 - 1, y0 - 1, z0 - 1, x1 + 1, y1 + 1, z1 + 1, level);
+}
+
+void LevelRenderer::setMaxMemory(unsigned int max)
+{
+	app.DebugPrintf("Changed chunk loader max memory to %dMB\n",max/1024/1024);
+	this->maxAllocatedMemory = max;
 }
 
 bool inline clip(float *bb, float *frustum)

@@ -136,6 +136,7 @@ enum eGameSetting
 	eGameSetting_RenderDistance,
 	eGameSetting_Gamma,
 	eGameSetting_FOV,
+	eGameSetting_ChunkLoaderMem,
 	eGameSetting_Difficulty,
 	eGameSetting_Sensitivity_InGame,
 	eGameSetting_Sensitivity_InMenu,
