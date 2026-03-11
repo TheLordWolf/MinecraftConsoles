@@ -68,6 +68,8 @@ public:
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 55 * 1024 * 1024;		// 4J - added
 	static const int MIN_COMMANDBUFFER_ALLOCATIONS = MAX_COMMANDBUFFER_ALLOCATIONS;
 #endif
+	static const unsigned int MAX_NEAR_DISTANCE = 96;
+	static const unsigned int MIN_NEAR_DISTANCE = 20;
 
 public:
 	LevelRenderer(Minecraft *mc, Textures *textures);
@@ -112,7 +114,10 @@ public:
 	void tileChanged(int x, int y, int z);
 	void tileLightChanged(int x, int y, int z);
 	void setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1, Level *level);	// 4J - added level param
+
 	void setMaxCommandBufferMemory(unsigned int max);
+	void setNearDistance(unsigned int dst);
+	void setForceDirtyChunkCheckPeriod(unsigned int ms);
 
 #ifdef __PS3__
 	void cull_SPU(int playerIndex, Culler *culler, float a);
@@ -175,6 +180,8 @@ private:
 	double zOld[4];						// 4J - now one per player
 
 	unsigned int maxCommandBufferMemory = MIN_COMMANDBUFFER_ALLOCATIONS;
+	unsigned int nearDistance = MAX_NEAR_DISTANCE;
+	unsigned int forceDirtyChunkCheckPeriodMs = MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
 
 	int totalChunks, offscreenChunks, occludedChunks, renderedChunks, emptyChunks;
 	static const int RENDERLISTS_LENGTH = 4;		// 4J - added
@@ -281,7 +288,11 @@ public:
 
 	bool				dirtyChunkPresent;
 	int64_t				lastDirtyChunkFound;
-	static const int	FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125; // decreased from 250 to 125 - updated by detectiveren
+	// switched to custom value instead of a const -updated by TheLordWolf 
+	// static const int	FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125; // decreased from 250 to 125 - updated by detectiveren
+	static const int    MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125;
+	static const int    MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 250;
+
 
 #ifdef _LARGE_WORLDS
 	static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8; // increased from 4 to 8 - updated by detectiveren

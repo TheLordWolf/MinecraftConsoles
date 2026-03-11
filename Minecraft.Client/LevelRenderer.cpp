@@ -1981,8 +1981,8 @@ bool LevelRenderer::updateDirtyChunks()
 						{
 							if( (!onlyRebuild) ||
 								globalChunkFlags[ pClipChunk->globalIdx ] & CHUNK_FLAG_COMPILED ||
-								( distSq < 96 * 96 ) )	// Always rebuild really near things or else building (say) at tower up into empty blocks when we are low on memory will not create render data
-							{	// distSq adjusted from 20 * 20 to 96 * 96 - updated by detectiveren
+								( distSq < this->rebuildDistance * this->rebuildDistance ) )	// Always rebuild really near things or else building (say) at tower up into empty blocks when we are low on memory will not create render data
+							{	// distSq adjusted from 20 * 20 to 96 * 96 - updated by detectiveren //distSq now uses a custom value - updated by TheLordWolf
 								considered++;
 								// Is this chunk nearer than our nearest?
 #ifdef _LARGE_WORLDS
@@ -2165,7 +2165,7 @@ bool LevelRenderer::updateDirtyChunks()
 	else
 	{
 		// Nothing to do - clear flags that there are things to process, unless it's been a while since we found any dirty chunks in which case force a check next time through
-		if( ( System::currentTimeMillis() - lastDirtyChunkFound ) > FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS )
+		if( ( System::currentTimeMillis() - lastDirtyChunkFound ) > this->forceDirtyChunkCheckPeriodMs )
 		{
 			dirtyChunkPresent = true;
 		}
@@ -2446,13 +2446,29 @@ void LevelRenderer::setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1
 	setDirty(x0 - 1, y0 - 1, z0 - 1, x1 + 1, y1 + 1, z1 + 1, level);
 }
 
-void LevelRenderer::setCommandBufferMemory(unsigned int max)
+void LevelRenderer::setMaxCommandBufferMemory(unsigned int max)
 {
 	if (max > MAX_COMMANDBUFFER_ALLOCATIONS) max = MAX_COMMANDBUFFER_ALLOCATIONS;
 	if (max < MIN_COMMANDBUFFER_ALLOCATIONS) max = MIN_COMMANDBUFFER_ALLOCATIONS;
-	
+
 	app.DebugPrintf("Changed chunk maxCommandBufferMemory to %dMB\n",max/1024/1024);
 	this->maxCommandBufferMemory = max;
+}
+void LevelRenderer::setNearDistance(unsigned int dst)
+{
+	if (dst > MAX_NEAR_DISTANCE) dst = MAX_NEAR_DISTANCE;
+	if (dst < MIN_NEAR_DISTANCE) dst = MIN_NEAR_DISTANCE;
+
+	app.DebugPrintf("Changed chunk nearDistance to %d^2",dst);
+	this->nearDistance = dst;
+}
+void LevelRenderer::setForceDirtyChunkCheckPeriod(unsigned int ms)
+{
+	if (ms > MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) ms = MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+	if (ms < MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) ms = MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+
+	app.DebugPrintf("Changed chunk force dirty chunk update to %dms",ms);
+	this->forceDirtyChunkCheckPeriodMs = ms;
 }
 
 bool inline clip(float *bb, float *frustum)
