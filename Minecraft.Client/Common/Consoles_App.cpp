@@ -838,7 +838,7 @@ int CMinecraftApp::SetDefaultOptions(C_4JProfile::PROFILESETTINGS *pSettings,con
 	SetGameSettings(iPad,eGameSetting_RenderDistance,16);
 	SetGameSettings(iPad,eGameSetting_Gamma,50);
 	SetGameSettings(iPad,eGameSetting_FOV,0);
-	SetGameSettings(iPad,eGameSetting_ChunkLoaderMem,1024);
+	SetGameSettings(iPad,eGameSetting_ChunkCommandBufferMem,LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS);
 
 	// 4J-PB - Don't reset the difficult level if we're in-game
 	if(Minecraft::GetInstance()->level==nullptr)
@@ -1335,7 +1335,7 @@ void CMinecraftApp::ApplyGameSettingsChanged(int iPad)
 	ActionGameSettings(iPad,eGameSetting_RenderDistance	);
 	ActionGameSettings(iPad,eGameSetting_Gamma			);
 	ActionGameSettings(iPad,eGameSetting_FOV			);
-	ActionGameSettings(iPad,eGameSetting_ChunkLoaderMem );
+	ActionGameSettings(iPad,eGameSetting_ChunkCommandBufferMem );
 	ActionGameSettings(iPad,eGameSetting_Difficulty		);
 	ActionGameSettings(iPad,eGameSetting_Sensitivity_InGame	);
 	ActionGameSettings(iPad,eGameSetting_ViewBob		);
@@ -1413,7 +1413,7 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 			pMinecraft->options->set(Options::Option::FOV, (float)GameSettingsA[iPad]->ucFov / 100.0f);
 		}
 		break;
-	case eGameSetting_ChunkLoaderMem:
+	case eGameSetting_ChunkCommandBufferMem:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
 			std::string str = "chunk-memory alloc : " + std::to_string(GameSettingsA[iPad]->ucChunkAllocatedMem) + "\n";
@@ -1845,7 +1845,7 @@ void CMinecraftApp::SetGameSettingsUInt(int iPad, eGameSetting eVal, unsigned in
 {
 	switch (eVal)
 	{
-	case eGameSetting_ChunkLoaderMem:
+	case eGameSetting_ChunkCommandBufferMem:
 		if (GameSettingsA[iPad]->ucChunkAllocatedMem != ucVal)
 		{
 			GameSettingsA[iPad]->ucChunkAllocatedMem = ucVal;
@@ -1919,7 +1919,7 @@ void CMinecraftApp::SetGameSettings(int iPad,eGameSetting eVal,unsigned char ucV
 			GameSettingsA[iPad]->bSettingsChanged=true;
 		}
 		break;
-	//case eGameSetting_ChunkLoaderMem:
+	//case eGameSetting_ChunkCommandBufferMem:
 	//	if (GameSettingsA[iPad]->ucChunkAllocatedMem != ucVal)
 	//	{
 	//		GameSettingsA[iPad]->ucChunkAllocatedMem = ucVal;
@@ -2360,7 +2360,7 @@ unsigned int CMinecraftApp::GetGameSettingsUInt(int iPad, eGameSetting eVal)
 {
 	switch (eVal)
 	{
-	case eGameSetting_ChunkLoaderMem:
+	case eGameSetting_ChunkCommandBufferMem:
 		return GameSettingsA[iPad]->ucChunkAllocatedMem;
 		break;
 	}
@@ -2389,7 +2389,7 @@ unsigned char CMinecraftApp::GetGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_FOV:
 		return GameSettingsA[iPad]->ucFov;
 		break;
-	// case eGameSetting_ChunkLoaderMem:
+	// case eGameSetting_ChunkCommandBufferMem:
 		// return GameSettingsA[iPad]->ucChunkAllocatedMem;
 		// break;
 	case eGameSetting_Difficulty:		

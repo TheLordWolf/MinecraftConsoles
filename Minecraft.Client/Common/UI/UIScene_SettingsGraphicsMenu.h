@@ -15,12 +15,12 @@ private:
 		eControl_RenderDistance,
 		eControl_Gamma,
 		eControl_FOV,
-		eControl_ChunkLoaderMem,
+		eControl_ChunkCommandBufferMem,
 		eControl_InterfaceOpacity
 	};
 
 	UIControl_CheckBox m_checkboxClouds, m_checkboxBedrockFog, m_checkboxCustomSkinAnim; // Checkboxes
-	UIControl_Slider m_sliderRenderDistance, m_sliderGamma, m_sliderFOV, m_sliderChunkAllocatedMem, m_sliderInterfaceOpacity; // Sliders
+	UIControl_Slider m_sliderRenderDistance, m_sliderGamma, m_sliderFOV, m_sliderChunkCommandBufferMem, m_sliderInterfaceOpacity; // Sliders
 	UI_BEGIN_MAP_ELEMENTS_AND_NAMES(UIScene)
 		UI_MAP_ELEMENT( m_checkboxClouds, "Clouds")
 		UI_MAP_ELEMENT( m_checkboxBedrockFog, "BedrockFog")
@@ -28,7 +28,7 @@ private:
 		UI_MAP_ELEMENT( m_sliderRenderDistance, "RenderDistance")
 		UI_MAP_ELEMENT( m_sliderGamma, "Gamma")
 		UI_MAP_ELEMENT(m_sliderFOV, "FOV")
-		UI_MAP_ELEMENT( m_sliderChunkAllocatedMem, "ChunkLoaderAllocatedMem")
+		UI_MAP_ELEMENT( m_sliderChunkCommandBufferMem, "ChunkLoaderAllocatedMem")
 		UI_MAP_ELEMENT( m_sliderInterfaceOpacity, "InterfaceOpacity")
 	UI_END_MAP_ELEMENTS_AND_NAMES()
 

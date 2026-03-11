@@ -1852,9 +1852,9 @@ bool LevelRenderer::updateDirtyChunks()
 	throttle++;
 	*/
 	PIXAddNamedCounter(static_cast<float>(memAlloc)/(1024.0f*1024.0f),"Command buffer allocations");
-	bool onlyRebuild = ( memAlloc >= this->maxAllocatedMemory );
+	bool onlyRebuild = ( memAlloc >= this->maxCommandBufferMemory );
 	EnterCriticalSection(&m_csDirtyChunks);
-	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxAllocatedMemory /1024/1024) + "\n\n";
+	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxCommandBufferMemory /1024/1024) + "\n\n";
 	app.DebugPrintf(str.c_str());
 
 	// Move any dirty chunks stored in the lock free stack into global flags
@@ -2446,10 +2446,13 @@ void LevelRenderer::setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1
 	setDirty(x0 - 1, y0 - 1, z0 - 1, x1 + 1, y1 + 1, z1 + 1, level);
 }
 
-void LevelRenderer::setMaxMemory(unsigned int max)
+void LevelRenderer::setCommandBufferMemory(unsigned int max)
 {
-	app.DebugPrintf("Changed chunk loader max memory to %dMB\n",max/1024/1024);
-	this->maxAllocatedMemory = max;
+	if (max > MAX_COMMANDBUFFER_ALLOCATIONS) max = MAX_COMMANDBUFFER_ALLOCATIONS;
+	if (max < MIN_COMMANDBUFFER_ALLOCATIONS) max = MIN_COMMANDBUFFER_ALLOCATIONS;
+	
+	app.DebugPrintf("Changed chunk maxCommandBufferMemory to %dMB\n",max/1024/1024);
+	this->maxCommandBufferMemory = max;
 }
 
 bool inline clip(float *bb, float *frustum)

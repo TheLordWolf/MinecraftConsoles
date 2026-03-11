@@ -54,15 +54,21 @@ public:
 	static const int CHUNK_Y_COUNT = Level::maxBuildHeight / CHUNK_SIZE;
 #if defined _WINDOWS64
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 2047 * 1024 * 1024;	// Changed to 2047. 4J had set to 512.
+	static const int MIN_COMMANDBUFFER_ALLOCATIONS = 512 * 1024 * 1024;
 #elif defined _XBOX_ONE
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 512 * 1024 * 1024;		// 4J - added
+	static const int MIN_COMMANDBUFFER_ALLOCATIONS = MAX_COMMANDBUFFER_ALLOCATIONS;
 #elif defined __ORBIS__
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 448 * 1024 * 1024;		// 4J - added - hard limit is 512 so giving a lot of headroom here for fragmentation (have seen 16MB lost to fragmentation in multiplayer crash dump before)
+	static const int MIN_COMMANDBUFFER_ALLOCATIONS = MAX_COMMANDBUFFER_ALLOCATIONS;
 #elif defined __PS3__
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 110 * 1024 * 1024;		// 4J - added
+	static const int MIN_COMMANDBUFFER_ALLOCATIONS = MAX_COMMANDBUFFER_ALLOCATIONS;
 #else
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 55 * 1024 * 1024;		// 4J - added
+	static const int MIN_COMMANDBUFFER_ALLOCATIONS = MAX_COMMANDBUFFER_ALLOCATIONS;
 #endif
+
 public:
 	LevelRenderer(Minecraft *mc, Textures *textures);
 private:
@@ -106,7 +112,7 @@ public:
 	void tileChanged(int x, int y, int z);
 	void tileLightChanged(int x, int y, int z);
 	void setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1, Level *level);	// 4J - added level param
-	void setMaxMemory(unsigned int max);
+	void setMaxCommandBufferMemory(unsigned int max);
 
 #ifdef __PS3__
 	void cull_SPU(int playerIndex, Culler *culler, float a);
@@ -168,7 +174,7 @@ private:
 	double yOld[4];						// 4J - now one per player
 	double zOld[4];						// 4J - now one per player
 
-	int maxAllocatedMemory = 1024;
+	unsigned int maxCommandBufferMemory = MIN_COMMANDBUFFER_ALLOCATIONS;
 
 	int totalChunks, offscreenChunks, occludedChunks, renderedChunks, emptyChunks;
 	static const int RENDERLISTS_LENGTH = 4;		// 4J - added
