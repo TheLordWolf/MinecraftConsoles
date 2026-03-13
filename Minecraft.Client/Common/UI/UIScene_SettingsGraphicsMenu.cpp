@@ -5,6 +5,8 @@
 #include "..\..\Options.h"
 #include "..\..\GameRenderer.h"
 
+#include "../../LevelRenderer.h"
+
 namespace
 {
     constexpr int FOV_MIN = 70;
