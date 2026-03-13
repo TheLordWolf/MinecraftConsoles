@@ -15,7 +15,7 @@ public:
     class Option
 	{
 	public:
-		static const Option options[17];
+		static const Option options[18];
 		static const Option *MUSIC;
 		static const Option *SOUND;
 		static const Option *INVERT_MOUSE;
@@ -31,7 +31,7 @@ public:
 		static const Option *GUI_SCALE;
 		static const Option *FOV;
 		static const Option *GAMMA;
-         //static const Option *CHUNK_ALLOCATED_MEM; //chunk-memory TODO reads it 
+        static const Option *CHUNK_ALLOCATED_MEM;
 		static const Option *RENDER_CLOUDS;
 		static const Option *PARTICLES;
 
@@ -110,6 +110,7 @@ public:
     int guiScale;
 	int particles; // 0 is all, 1 is decreased and 2 is minimal
 	float fov;
+	unsigned int chunkCommandBufferMem;
 	float gamma;
 
 	void init();	// 4J added

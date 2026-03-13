@@ -80,14 +80,16 @@ UIScene_SettingsGraphicsMenu::UIScene_SettingsGraphicsMenu(int iPad, void *initD
 	m_sliderFOV.init(TempString, eControl_FOV, 0, FOV_SLIDER_MAX, initialFovSlider);
 		
 	//chunk-memory (maybe ?) temporary checkout
-	int allocatedVal = app.GetGameSettings(m_iPad, eGameSetting_ChunkCommandBufferMem);
+	int allocatedVal = app.GetGameSettingsUInt(m_iPad, eGameSetting_ChunkCommandBufferMem);
 	if (allocatedVal < LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS)
 		allocatedVal = LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS;
 	if (allocatedVal > LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS)
 		allocatedVal = LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS;
 
-	swprintf(TempString, 256, L"Chunk CommandBuffer memory: %dMB", allocatedVal);
-	m_sliderChunkCommandBufferMem.init(TempString, eControl_ChunkCommandBufferMem, 128, 2048, allocatedVal);
+	constexpr unsigned int MIN_COMMAND_BUFFER_MB = LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024;
+	constexpr unsigned int MAX_COMMAND_BUFFER_MB = LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024;
+	swprintf(TempString, 256, L"Chunk memory: %dMB", allocatedVal/1024/1024);
+	m_sliderChunkCommandBufferMem.init(TempString, eControl_ChunkCommandBufferMem, MIN_COMMAND_BUFFER_MB, MAX_COMMAND_BUFFER_MB, allocatedVal);
 
 	swprintf( TempString, 256, L"%ls: %d%%", app.GetString( IDS_SLIDER_INTERFACEOPACITY ),app.GetGameSettings(m_iPad,eGameSetting_InterfaceOpacity));	
 	m_sliderInterfaceOpacity.init(TempString,eControl_InterfaceOpacity,0,100,app.GetGameSettings(m_iPad,eGameSetting_InterfaceOpacity));
@@ -200,7 +202,6 @@ void UIScene_SettingsGraphicsMenu::handleInput(int iPad, int key, bool repeat, b
 void UIScene_SettingsGraphicsMenu::handleSliderMove(F64 sliderId, F64 currentValue)
 {
 	WCHAR TempString[256];
-	std::string str;
 	const int value = static_cast<int>(currentValue);
 	switch(static_cast<int>(sliderId))
 	{
@@ -246,9 +247,10 @@ void UIScene_SettingsGraphicsMenu::handleSliderMove(F64 sliderId, F64 currentVal
 			m_sliderChunkCommandBufferMem.handleSliderMove(roundedVal);
 			app.SetGameSettingsUInt(m_iPad, eGameSetting_ChunkCommandBufferMem, static_cast<unsigned int>(roundedVal*1024*1024));
 
+			std::string str;
 			str = "chunk-memory alloc UI : " + std::to_string(roundedVal) + "\n";			
 			app.DebugPrintf(str.c_str());
-			swprintf(TempString, 256, L"Chunk CommandBuffer memory: %dMB", roundedVal);
+			swprintf(TempString, 256, L"Chunk memory: %dMB", roundedVal);
 			m_sliderChunkCommandBufferMem.setLabel(TempString);
 		}
 		break;

@@ -28,7 +28,7 @@ private:
 		UI_MAP_ELEMENT( m_sliderRenderDistance, "RenderDistance")
 		UI_MAP_ELEMENT( m_sliderGamma, "Gamma")
 		UI_MAP_ELEMENT(m_sliderFOV, "FOV")
-		UI_MAP_ELEMENT( m_sliderChunkCommandBufferMem, "ChunkLoaderAllocatedMem")
+		UI_MAP_ELEMENT( m_sliderChunkCommandBufferMem, "ChunkCommandBufferMem")
 		UI_MAP_ELEMENT( m_sliderInterfaceOpacity, "InterfaceOpacity")
 	UI_END_MAP_ELEMENTS_AND_NAMES()
 

@@ -1418,9 +1418,8 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 		{
 			std::string str = "chunk-memory alloc : " + std::to_string(GameSettingsA[iPad]->ucChunkAllocatedMem) + "\n";
 			app.DebugPrintf(str.c_str());
-			//chunk-memory todo uncomment when this part is done
-			//pMinecraft->options->set(Options::Option::CHUNK_ALLOCATED_MEM, static_cast<float>(GameSettingsA[iPad]->ucChunkAllocatedMem));
 			pMinecraft->levelRenderer->setMaxCommandBufferMemory(GameSettingsA[iPad]->ucChunkAllocatedMem);
+			pMinecraft->options->set(Options::Option::CHUNK_ALLOCATED_MEM, static_cast<float>(GameSettingsA[iPad]->ucChunkAllocatedMem));
 		}
 		break;
 	case eGameSetting_Difficulty:		

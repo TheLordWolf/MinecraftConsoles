@@ -295,6 +295,7 @@ public:
 
 
 #ifdef _LARGE_WORLDS
+	//chunk-memory todo switch the arrays to a vector so we can use custom value for the max number of concurrent chunk rebuilds
 	static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8; // increased from 4 to 8 - updated by detectiveren
 	static const int MAX_CHUNK_REBUILD_THREADS = MAX_CONCURRENT_CHUNK_REBUILDS - 1;
 	static Chunk permaChunk[MAX_CONCURRENT_CHUNK_REBUILDS];
