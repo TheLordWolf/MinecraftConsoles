@@ -78,7 +78,7 @@ UIScene_SettingsGraphicsMenu::UIScene_SettingsGraphicsMenu(int iPad, void *initD
 	const int initialFovDeg = sliderValueToFov(initialFovSlider);
 	swprintf(TempString, 256, L"FOV: %d", initialFovDeg);
 	m_sliderFOV.init(TempString, eControl_FOV, 0, FOV_SLIDER_MAX, initialFovSlider);
-		
+
 	//chunk-memory (maybe ?) temporary checkout
 	int allocatedVal = app.GetGameSettingsUInt(m_iPad, eGameSetting_ChunkCommandBufferMem);
 	if (allocatedVal < LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS)
@@ -88,11 +88,20 @@ UIScene_SettingsGraphicsMenu::UIScene_SettingsGraphicsMenu(int iPad, void *initD
 
 	constexpr unsigned int MIN_COMMAND_BUFFER_MB = LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024;
 	constexpr unsigned int MAX_COMMAND_BUFFER_MB = LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024;
-	swprintf(TempString, 256, L"Chunk memory: %dMB", allocatedVal/1024/1024);
+	swprintf(TempString, 256, L"Chunk memory: %dMB", allocatedVal / 1024 / 1024);
 	m_sliderChunkCommandBufferMem.init(TempString, eControl_ChunkCommandBufferMem, MIN_COMMAND_BUFFER_MB, MAX_COMMAND_BUFFER_MB, allocatedVal);
+
+	swprintf(TempString, 256, L"Chunk Near Distance: %d", app.GetGameSettings(m_iPad, eGameSetting_ChunkNearDistance));
+	//swprintf(TempString, 256, L"Chunk Near Distance: %d", 20);
+	m_sliderChunkNearDistance.init(TempString, eControl_ChunkNearDistance, LevelRenderer::MIN_NEAR_DISTANCE, LevelRenderer::MAX_NEAR_DISTANCE, app.GetGameSettings(m_iPad, eGameSetting_ChunkNearDistance));
+
+	swprintf(TempString, 256, L"Chunk Force Update : %dMS", app.GetGameSettings(m_iPad, eGameSetting_ChunkForceUpdatePeriodMS));
+	m_sliderChunkForceUpdatePeriodMS.init(TempString, eControl_ChunkForceUpdatePeriodMS, LevelRenderer::MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS, LevelRenderer::MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS, app.GetGameSettings(m_iPad, eGameSetting_ChunkForceUpdatePeriodMS));
+
 
 	swprintf( TempString, 256, L"%ls: %d%%", app.GetString( IDS_SLIDER_INTERFACEOPACITY ),app.GetGameSettings(m_iPad,eGameSetting_InterfaceOpacity));	
 	m_sliderInterfaceOpacity.init(TempString,eControl_InterfaceOpacity,0,100,app.GetGameSettings(m_iPad,eGameSetting_InterfaceOpacity));
+
 
 	doHorizontalResizeCheck();
 
@@ -245,13 +254,41 @@ void UIScene_SettingsGraphicsMenu::handleSliderMove(F64 sliderId, F64 currentVal
 		{
 			const int roundedVal = value - (value % 128);
 			m_sliderChunkCommandBufferMem.handleSliderMove(roundedVal);
-			app.SetGameSettingsUInt(m_iPad, eGameSetting_ChunkCommandBufferMem, static_cast<unsigned int>(roundedVal*1024*1024));
+			app.SetGameSettingsUInt(m_iPad, eGameSetting_ChunkCommandBufferMem, static_cast<unsigned int>(roundedVal * 1024 * 1024));
 
 			std::string str;
-			str = "chunk-memory alloc UI : " + std::to_string(roundedVal) + "\n";			
+			str = "chunk-memory alloc UI : " + std::to_string(roundedVal) + "\n";
 			app.DebugPrintf(str.c_str());
 			swprintf(TempString, 256, L"Chunk memory: %dMB", roundedVal);
 			m_sliderChunkCommandBufferMem.setLabel(TempString);
+		}
+		break;
+	case eControl_ChunkNearDistance:
+		{
+			m_sliderChunkNearDistance.handleSliderMove(value);
+			app.SetGameSettings(m_iPad, eGameSetting_ChunkNearDistance,value);
+
+			std::string str;
+			str = "chunk-near  UI : " + std::to_string(value) + "\n";
+			app.DebugPrintf(str.c_str());
+
+			swprintf(TempString, 256, L"Chunk Near Distance: %d", value);
+			m_sliderChunkNearDistance.setLabel(TempString);
+
+		}
+		break;
+	case eControl_ChunkForceUpdatePeriodMS:
+		{
+			m_sliderChunkForceUpdatePeriodMS.handleSliderMove(value);
+			app.SetGameSettings(m_iPad, eGameSetting_ChunkForceUpdatePeriodMS, value);
+
+			std::string str;
+			str = "chunk-force  UI : " + std::to_string(value) + "\n";
+			app.DebugPrintf(str.c_str());
+
+			swprintf(TempString, 256, L"Chunk Force Update : %dms", value);
+			m_sliderChunkForceUpdatePeriodMS.setLabel(TempString);
+
 		}
 		break;
 	case eControl_InterfaceOpacity:

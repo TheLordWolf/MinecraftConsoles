@@ -838,7 +838,9 @@ int CMinecraftApp::SetDefaultOptions(C_4JProfile::PROFILESETTINGS *pSettings,con
 	SetGameSettings(iPad,eGameSetting_RenderDistance,16);
 	SetGameSettings(iPad,eGameSetting_Gamma,50);
 	SetGameSettings(iPad,eGameSetting_FOV,0);
-	SetGameSettings(iPad,eGameSetting_ChunkCommandBufferMem,LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS);
+	SetGameSettings(iPad,eGameSetting_ChunkCommandBufferMem, LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS);
+	SetGameSettings(iPad,eGameSetting_ChunkNearDistance, LevelRenderer::MIN_NEAR_DISTANCE);
+	SetGameSettings(iPad,eGameSetting_ChunkForceUpdatePeriodMS,LevelRenderer::MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS);
 
 	// 4J-PB - Don't reset the difficult level if we're in-game
 	if(Minecraft::GetInstance()->level==nullptr)
@@ -1335,7 +1337,9 @@ void CMinecraftApp::ApplyGameSettingsChanged(int iPad)
 	ActionGameSettings(iPad,eGameSetting_RenderDistance	);
 	ActionGameSettings(iPad,eGameSetting_Gamma			);
 	ActionGameSettings(iPad,eGameSetting_FOV			);
-	ActionGameSettings(iPad,eGameSetting_ChunkCommandBufferMem );
+	ActionGameSettings(iPad,eGameSetting_ChunkCommandBufferMem);
+	ActionGameSettings(iPad,eGameSetting_ChunkNearDistance);
+	ActionGameSettings(iPad,eGameSetting_ChunkForceUpdatePeriodMS);
 	ActionGameSettings(iPad,eGameSetting_Difficulty		);
 	ActionGameSettings(iPad,eGameSetting_Sensitivity_InGame	);
 	ActionGameSettings(iPad,eGameSetting_ViewBob		);
@@ -1420,6 +1424,24 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 			app.DebugPrintf(str.c_str());
 			pMinecraft->levelRenderer->setMaxCommandBufferMemory(GameSettingsA[iPad]->ucChunkAllocatedMem);
 			pMinecraft->options->set(Options::Option::CHUNK_ALLOCATED_MEM, static_cast<float>(GameSettingsA[iPad]->ucChunkAllocatedMem));
+		}
+		break;
+	case eGameSetting_ChunkNearDistance:
+		if (iPad == ProfileManager.GetPrimaryPad())
+		{
+			std::string str = "chunk-distance : " + std::to_string(GameSettingsA[iPad]->ucChunkNearDistance) + "\n";
+			app.DebugPrintf(str.c_str());
+			pMinecraft->levelRenderer->setNearDistance(GameSettingsA[iPad]->ucChunkNearDistance);
+			pMinecraft->options->set(Options::Option::CHUNK_NEAR_DISTANCE, static_cast<float>(GameSettingsA[iPad]->ucChunkNearDistance));
+		}
+		break;
+	case eGameSetting_ChunkForceUpdatePeriodMS:
+		if (iPad == ProfileManager.GetPrimaryPad())
+		{
+			std::string str = "chunk-force : " + std::to_string(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS) + "\n";
+			app.DebugPrintf(str.c_str());
+			pMinecraft->levelRenderer->setForceDirtyChunkCheckPeriod(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS);
+			pMinecraft->options->set(Options::Option::CHUNK_FORCE_UPDATE_PERIOD_MS, static_cast<float>(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS));
 		}
 		break;
 	case eGameSetting_Difficulty:		
@@ -1918,17 +1940,28 @@ void CMinecraftApp::SetGameSettings(int iPad,eGameSetting eVal,unsigned char ucV
 			GameSettingsA[iPad]->bSettingsChanged=true;
 		}
 		break;
-	//case eGameSetting_ChunkCommandBufferMem:
-	//	if (GameSettingsA[iPad]->ucChunkAllocatedMem != ucVal)
-	//	{
-	//		GameSettingsA[iPad]->ucChunkAllocatedMem = ucVal;
-	//		if (iPad == ProfileManager.GetPrimaryPad())
-	//		{
-	//			ActionGameSettings(iPad, eVal);
-	//		}
-	//		GameSettingsA[iPad]->bSettingsChanged = true;
-	//	}
-	//	break;
+	case eGameSetting_ChunkNearDistance:
+		if (GameSettingsA[iPad]->ucChunkNearDistance != ucVal)
+		{
+			GameSettingsA[iPad]->ucChunkNearDistance = ucVal;
+			if (iPad == ProfileManager.GetPrimaryPad())
+			{
+				ActionGameSettings(iPad, eVal);
+			}
+			GameSettingsA[iPad]->bSettingsChanged = true;
+		}
+		break;
+	case eGameSetting_ChunkForceUpdatePeriodMS:
+		if (GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS != ucVal)
+		{
+			GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS = ucVal;
+			if (iPad == ProfileManager.GetPrimaryPad())
+			{
+				ActionGameSettings(iPad, eVal);
+			}
+			GameSettingsA[iPad]->bSettingsChanged = true;
+		}
+		break;
 	case eGameSetting_Difficulty:		
 		if((GameSettingsA[iPad]->usBitmaskValues&0x03)!=(ucVal&0x03))
 		{
@@ -2388,9 +2421,12 @@ unsigned char CMinecraftApp::GetGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_FOV:
 		return GameSettingsA[iPad]->ucFov;
 		break;
-	// case eGameSetting_ChunkCommandBufferMem:
-		// return GameSettingsA[iPad]->ucChunkAllocatedMem;
-		// break;
+	case eGameSetting_ChunkNearDistance:
+		return GameSettingsA[iPad]->ucChunkNearDistance;
+		break;
+	case eGameSetting_ChunkForceUpdatePeriodMS:
+		return GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS;
+		break;
 	case eGameSetting_Difficulty:		
 		return GameSettingsA[iPad]->usBitmaskValues&0x0003;
 		break;

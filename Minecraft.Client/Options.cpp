@@ -15,7 +15,7 @@
 #include "..\Minecraft.World\StringHelpers.h"
 
 // 4J - the Option sub-class used to be an java enumerated type, trying to emulate that functionality here
-const Options::Option Options::Option::options[18] =
+const Options::Option Options::Option::options[20] =
 {
 	Options::Option(L"options.music", true, false),
 	Options::Option(L"options.sound", true, false),
@@ -32,6 +32,8 @@ const Options::Option Options::Option::options[18] =
 	Options::Option(L"options.guiScale", false, false),
 	Options::Option(L"options.fov", true, false),
 	Options::Option(L"options.chunkCommandBufferMem", false, false),
+	Options::Option(L"options.chunkNearDistance", false, false),
+	Options::Option(L"options.chunkForceUpdatePeriodMs", false, false),
 	Options::Option(L"options.gamma", true, false),
 	Options::Option(L"options.renderClouds",false, true),
 	Options::Option(L"options.particles", false, false),
@@ -51,10 +53,12 @@ const Options::Option *Options::Option::GRAPHICS = &Options::Option::options[10]
 const Options::Option *Options::Option::AMBIENT_OCCLUSION = &Options::Option::options[11];
 const Options::Option *Options::Option::GUI_SCALE = &Options::Option::options[12];
 const Options::Option* Options::Option::FOV = &Options::Option::options[13];
-const Options::Option *Options::Option::CHUNK_ALLOCATED_MEM = &Options::Option::options[14];
-const Options::Option *Options::Option::GAMMA = &Options::Option::options[15];
-const Options::Option *Options::Option::RENDER_CLOUDS = &Options::Option::options[16];
-const Options::Option *Options::Option::PARTICLES = &Options::Option::options[17];
+const Options::Option* Options::Option::CHUNK_ALLOCATED_MEM = &Options::Option::options[14];
+const Options::Option* Options::Option::CHUNK_NEAR_DISTANCE = &Options::Option::options[15];
+const Options::Option *Options::Option::CHUNK_FORCE_UPDATE_PERIOD_MS = &Options::Option::options[16];
+const Options::Option *Options::Option::GAMMA = &Options::Option::options[17];
+const Options::Option *Options::Option::RENDER_CLOUDS = &Options::Option::options[18];
+const Options::Option *Options::Option::PARTICLES = &Options::Option::options[19];
 
 
 const Options::Option *Options::Option::getItem(int id)
@@ -171,6 +175,9 @@ void Options::init()
 	guiScale = 0;
 	particles = 0;
 	fov = 0;
+	chunkCommandBufferMem = LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS;
+	chunkNearDistance = LevelRenderer::MIN_NEAR_DISTANCE;
+	chunkForceUpdatePeriodMs = LevelRenderer::MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
 	gamma = 0;
 }
 
@@ -239,6 +246,14 @@ void Options::set(const Options::Option *item, float fVal)
 	if (item == Option::CHUNK_ALLOCATED_MEM)
 	{
 		chunkCommandBufferMem = static_cast<unsigned int>(fVal);
+	}
+	if (item == Option::CHUNK_NEAR_DISTANCE)
+	{
+		chunkNearDistance = static_cast<unsigned char>(fVal);
+	}
+	if (item == Option::CHUNK_FORCE_UPDATE_PERIOD_MS)
+	{
+		chunkForceUpdatePeriodMs = static_cast<unsigned char>(fVal);
 	}
 	if (item == Option::GAMMA)
 	{
@@ -445,6 +460,8 @@ void Options::load()
                 if (cmds[0] == L"mouseSensitivity") sensitivity = readFloat(cmds[1]);
 				if (cmds[0] == L"fov") fov = readFloat(cmds[1]);
 				if (cmds[0] == L"chunkCommandBufferMem") chunkCommandBufferMem = readFloat(cmds[1]);
+				if (cmds[0] == L"chunkNearDistance") chunkNearDistance = readFloat(cmds[1]);
+				if (cmds[0] == L"chunkForceUpdatePeriodMs") chunkForceUpdatePeriodMs = readFloat(cmds[1]);
 				if (cmds[0] == L"gamma") gamma = readFloat(cmds[1]);
                 if (cmds[0] == L"invertYMouse") invertYMouse = cmds[1]==L"true";
                 if (cmds[0] == L"viewDistance") viewDistance = _fromString<int>(cmds[1]);
@@ -504,6 +521,8 @@ void Options::save()
         dos.writeChars(L"mouseSensitivity:" + std::to_wstring(sensitivity));
 		dos.writeChars(L"fov:" + std::to_wstring(fov));
 		dos.writeChars(L"chunkCommandBufferMem:" + std::to_wstring(chunkCommandBufferMem));
+		dos.writeChars(L"chunkNearDistance:" + std::to_wstring(chunkNearDistance));
+		dos.writeChars(L"chunkForceUpdatePeriodMs:" + std::to_wstring(chunkForceUpdatePeriodMs));
 		dos.writeChars(L"gamma:" + std::to_wstring(gamma));
         dos.writeChars(L"viewDistance:" + std::to_wstring(viewDistance));
         dos.writeChars(L"guiScale:" + std::to_wstring(guiScale));

@@ -15,7 +15,7 @@ public:
     class Option
 	{
 	public:
-		static const Option options[18];
+		static const Option options[20];
 		static const Option *MUSIC;
 		static const Option *SOUND;
 		static const Option *INVERT_MOUSE;
@@ -32,6 +32,8 @@ public:
 		static const Option *FOV;
 		static const Option *GAMMA;
         static const Option *CHUNK_ALLOCATED_MEM;
+        static const Option *CHUNK_NEAR_DISTANCE;
+        static const Option *CHUNK_FORCE_UPDATE_PERIOD_MS;
 		static const Option *RENDER_CLOUDS;
 		static const Option *PARTICLES;
 
@@ -111,6 +113,8 @@ public:
 	int particles; // 0 is all, 1 is decreased and 2 is minimal
 	float fov;
 	unsigned int chunkCommandBufferMem;
+	unsigned char chunkNearDistance;
+	unsigned char chunkForceUpdatePeriodMs;
 	float gamma;
 
 	void init();	// 4J added

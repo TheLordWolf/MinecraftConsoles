@@ -302,6 +302,18 @@ public:
 	static C4JThread *rebuildThreads[MAX_CHUNK_REBUILD_THREADS];
 	static C4JThread::EventArray *s_rebuildCompleteEvents;
 	static C4JThread::Event *s_activationEventA[MAX_CHUNK_REBUILD_THREADS];
+	
+	//static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8;
+	//static const int MIN_CONCURRENT_CHUNK_REBUILDS = 4;
+	//static const int MAX_CHUNK_REBUILD_THREADS = MAX_CONCURRENT_CHUNK_REBUILDS - 1;
+	//unsigned int currentMaxConcurrentChunkRebuilds = MIN_CONCURRENT_CHUNK_REBUILDS;
+	//unsigned int currentMaxChunkRebuildsThread = MIN_CONCURRENT_CHUNK_REBUILDS - 1;
+
+	//static std::vector<Chunk> permaChunk;
+	//static std::vector <C4JThread*> rebuildThreads;
+	//static C4JThread::EventArray* s_rebuildCompleteEvents;
+	//static std::vector<C4JThread::Event*> s_activationEventA;
+
 	static void staticCtor();
 	static int rebuildChunkThreadProc(LPVOID lpParam);
 
