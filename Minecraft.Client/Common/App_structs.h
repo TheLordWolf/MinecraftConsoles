@@ -67,7 +67,7 @@ typedef struct
 			unsigned char ucInterfaceOpacity;
 			unsigned char ucPad02;  // 1 byte padding
 			unsigned char ucFov;
-			unsigned int  ucChunkAllocatedMem;
+			unsigned char ucChunkAllocatedMem; //the proper value in byte is ucChunkAllocatedMem*1024*1024*128
 			unsigned char ucChunkNearDistance;
 			unsigned char ucChunkForceUpdatePeriodMS;
 

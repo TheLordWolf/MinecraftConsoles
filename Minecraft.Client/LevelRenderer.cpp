@@ -1854,7 +1854,7 @@ bool LevelRenderer::updateDirtyChunks()
 	PIXAddNamedCounter(static_cast<float>(memAlloc)/(1024.0f*1024.0f),"Command buffer allocations");
 	bool onlyRebuild = ( memAlloc >= this->maxCommandBufferMemory );
 	EnterCriticalSection(&m_csDirtyChunks);
-	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxCommandBufferMemory /1024/1024) + "\n\n";
+	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxCommandBufferMemory /1024/1024) + "\nchunk-dst :" + std::to_string(this->nearDistance) + "^2\nchunk-force :" + std::to_string(this->forceDirtyChunkCheckPeriodMs) + "ms\n\n";
 	app.DebugPrintf(str.c_str());
 
 	// Move any dirty chunks stored in the lock free stack into global flags

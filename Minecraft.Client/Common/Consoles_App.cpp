@@ -1420,9 +1420,9 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_ChunkCommandBufferMem:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
-			std::string str = "chunk-memory alloc : " + std::to_string(GameSettingsA[iPad]->ucChunkAllocatedMem) + "\n";
+			std::string str = "chunk-memory alloc : " + std::to_string(GameSettingsA[iPad]->ucChunkAllocatedMem*1024*1024*128) + "\n";
 			app.DebugPrintf(str.c_str());
-			pMinecraft->levelRenderer->setMaxCommandBufferMemory(GameSettingsA[iPad]->ucChunkAllocatedMem);
+			pMinecraft->levelRenderer->setMaxCommandBufferMemory(GameSettingsA[iPad]->ucChunkAllocatedMem*1024*1024*128);
 			pMinecraft->options->set(Options::Option::CHUNK_ALLOCATED_MEM, static_cast<float>(GameSettingsA[iPad]->ucChunkAllocatedMem));
 		}
 		break;
@@ -1862,23 +1862,6 @@ unsigned char CMinecraftApp::GetMinecraftLocale(int iPad)
 	}
 }
 
-void CMinecraftApp::SetGameSettingsUInt(int iPad, eGameSetting eVal, unsigned int ucVal)
-{
-	switch (eVal)
-	{
-	case eGameSetting_ChunkCommandBufferMem:
-		if (GameSettingsA[iPad]->ucChunkAllocatedMem != ucVal)
-		{
-			GameSettingsA[iPad]->ucChunkAllocatedMem = ucVal;
-			if (iPad == ProfileManager.GetPrimaryPad())
-			{
-				ActionGameSettings(iPad, eVal);
-			}
-			GameSettingsA[iPad]->bSettingsChanged = true;
-		}
-		break;
-	}
-}
 void CMinecraftApp::SetGameSettings(int iPad,eGameSetting eVal,unsigned char ucVal)
 {
 	//Minecraft *pMinecraft=Minecraft::GetInstance();
@@ -1938,6 +1921,17 @@ void CMinecraftApp::SetGameSettings(int iPad,eGameSetting eVal,unsigned char ucV
 				ActionGameSettings(iPad,eVal);
 			}
 			GameSettingsA[iPad]->bSettingsChanged=true;
+		}
+		break;
+	case eGameSetting_ChunkCommandBufferMem:
+		if (GameSettingsA[iPad]->ucChunkAllocatedMem != ucVal)
+		{
+			GameSettingsA[iPad]->ucChunkAllocatedMem = ucVal;
+			if (iPad == ProfileManager.GetPrimaryPad())
+			{
+				ActionGameSettings(iPad, eVal);
+			}
+			GameSettingsA[iPad]->bSettingsChanged = true;
 		}
 		break;
 	case eGameSetting_ChunkNearDistance:
@@ -2388,16 +2382,7 @@ unsigned char CMinecraftApp::GetGameSettings(eGameSetting eVal)
 
 	return GetGameSettings(iPad,eVal);
 }
-unsigned int CMinecraftApp::GetGameSettingsUInt(int iPad, eGameSetting eVal)
-{
-	switch (eVal)
-	{
-	case eGameSetting_ChunkCommandBufferMem:
-		return GameSettingsA[iPad]->ucChunkAllocatedMem;
-		break;
-	}
-	return 0;
-}
+
 unsigned char CMinecraftApp::GetGameSettings(int iPad,eGameSetting eVal)
 {
 	switch(eVal)
@@ -2420,6 +2405,9 @@ unsigned char CMinecraftApp::GetGameSettings(int iPad,eGameSetting eVal)
 		break;
 	case eGameSetting_FOV:
 		return GameSettingsA[iPad]->ucFov;
+		break;
+	case eGameSetting_ChunkCommandBufferMem:
+		return GameSettingsA[iPad]->ucChunkAllocatedMem;
 		break;
 	case eGameSetting_ChunkNearDistance:
 		return GameSettingsA[iPad]->ucChunkNearDistance;
