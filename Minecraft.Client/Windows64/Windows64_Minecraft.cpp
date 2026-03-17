@@ -49,6 +49,8 @@
 #include "Windows64_Xuid.h"
 #include "Common/UI/UI.h"
 
+#include "../LevelRenderer.h"
+
 // Forward-declare the internal Renderer class and its global instance from 4J_Render_PC_d.lib.
 // C4JRender (RenderManager) is a stateless wrapper — all D3D state lives in InternalRenderManager.
 class Renderer;
@@ -272,6 +274,23 @@ static Win64LaunchOptions ParseLaunchOptions()
 		else if (_wcsicmp(argv[i], L"-fullscreen") == 0)
 			options.fullscreen = true;
 	}
+
+
+	for (int i = 1; i < argc; ++i)
+	{
+		if (_wcsicmp(argv[i], L"-chunkThread") == 0)
+		{
+			wchar_t* endPtr = nullptr;
+			const unsigned int threadNb = wcstol(argv[++i], &endPtr, 10);
+			if (endPtr != argv[i] && *endPtr == 0 && threadNb >= LevelRenderer::MIN_CONCURRENT_CHUNK_REBUILDS && threadNb <= LevelRenderer::MAX_CONCURRENT_CHUNK_REBUILDS)
+			{
+				app.DebugPrintf("(launch args) Number of chunk thread : %d\n",threadNb);
+				LevelRenderer::setMaxChunkRebuild(threadNb);
+			}
+		}
+	}
+
+
 
 	LocalFree(argv);
 	return options;

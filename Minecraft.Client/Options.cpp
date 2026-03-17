@@ -245,7 +245,7 @@ void Options::set(const Options::Option *item, float fVal)
 	}
 	if (item == Option::CHUNK_ALLOCATED_MEM)
 	{
-		chunkCommandBufferMem = static_cast<unsigned int>(fVal);
+		chunkCommandBufferMem = static_cast<unsigned char>(fVal);
 	}
 	if (item == Option::CHUNK_NEAR_DISTANCE)
 	{

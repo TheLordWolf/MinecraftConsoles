@@ -252,8 +252,6 @@ void UIScene_SettingsGraphicsMenu::handleSliderMove(F64 sliderId, F64 currentVal
 		break;
 	case eControl_ChunkCommandBufferMem:
 		{
-			//const int roundedVal = value - (value % 128);
-			//const int roundedVal = value/1024/1024/128;
 			m_sliderChunkCommandBufferMem.handleSliderMove(value);
 			app.SetGameSettings(m_iPad, eGameSetting_ChunkCommandBufferMem, static_cast<unsigned char>(value));
 

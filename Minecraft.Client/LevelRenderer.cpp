@@ -83,10 +83,19 @@ ResourceLocation LevelRenderer::END_SKY_LOCATION = ResourceLocation(TN_MISC_TUNN
 const unsigned int HALO_RING_RADIUS = 100;
 
 #ifdef _LARGE_WORLDS
-Chunk LevelRenderer::permaChunk[MAX_CONCURRENT_CHUNK_REBUILDS];
-C4JThread *LevelRenderer::rebuildThreads[MAX_CHUNK_REBUILD_THREADS];
-C4JThread::EventArray *LevelRenderer::s_rebuildCompleteEvents;
-C4JThread::Event *LevelRenderer::s_activationEventA[MAX_CHUNK_REBUILD_THREADS];
+
+std::vector<Chunk> LevelRenderer::permaChunk;
+std::vector<C4JThread*> LevelRenderer::rebuildThreads;
+C4JThread::EventArray* LevelRenderer::s_rebuildCompleteEvents;
+std::vector<C4JThread::Event*> LevelRenderer::s_activationEventA;
+
+unsigned int LevelRenderer::currentMaxConcurrentChunkRebuilds = MAX_CONCURRENT_CHUNK_REBUILDS;
+unsigned int LevelRenderer::currentMaxChunkRebuildsThread = MAX_CHUNK_REBUILD_THREADS;
+
+//Chunk LevelRenderer::permaChunk[MAX_CONCURRENT_CHUNK_REBUILDS];
+//C4JThread *LevelRenderer::rebuildThreads[MAX_CHUNK_REBUILD_THREADS];
+//C4JThread::EventArray *LevelRenderer::s_rebuildCompleteEvents;
+//C4JThread::Event *LevelRenderer::s_activationEventA[MAX_CHUNK_REBUILD_THREADS];
 
 // This defines the maximum size of renderable level, must be big enough to cope with actual size of level + view distance at each side
 // so that we can render the "infinite" sea at the edges. Currently defined as:
@@ -1854,7 +1863,7 @@ bool LevelRenderer::updateDirtyChunks()
 	PIXAddNamedCounter(static_cast<float>(memAlloc)/(1024.0f*1024.0f),"Command buffer allocations");
 	bool onlyRebuild = ( memAlloc >= this->maxCommandBufferMemory );
 	EnterCriticalSection(&m_csDirtyChunks);
-	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxCommandBufferMemory /1024/1024) + "\nchunk-dst :" + std::to_string(this->nearDistance) + "^2\nchunk-force :" + std::to_string(this->forceDirtyChunkCheckPeriodMs) + "ms\n\n";
+	std::string str = "chunk-memory MemAlloc:" + std::to_string(memAlloc/1024/1024) + ">" + std::to_string(this->maxCommandBufferMemory /1024/1024) + "\nchunk-dst :" + std::to_string(this->nearDistance) + "^2\nchunk-force :" + std::to_string(this->forceDirtyChunkCheckPeriodMs) + "ms\nchunk-threads : (concurrent:"+std::to_string(currentMaxConcurrentChunkRebuilds)+"/rebuild:"+std::to_string(currentMaxChunkRebuildsThread)+")\n\n";
 	app.DebugPrintf(str.c_str());
 
 	// Move any dirty chunks stored in the lock free stack into global flags
@@ -1942,7 +1951,7 @@ bool LevelRenderer::updateDirtyChunks()
 #else // __PS3__
 
 #ifdef _LARGE_WORLDS
-		int maxNearestChunks = MAX_CONCURRENT_CHUNK_REBUILDS;
+		int maxNearestChunks = currentMaxConcurrentChunkRebuilds;
 		// 4J Stu - On XboxOne we should cut this down if in a constrained state so the saving threads get more time
 #endif
 		// Find nearest chunk that is dirty
@@ -2084,8 +2093,8 @@ bool LevelRenderer::updateDirtyChunks()
 		LeaveCriticalSection(&m_csDirtyChunks);
 
 		--index; // Bring it back into 0 counted range
-
-		for(int i = MAX_CHUNK_REBUILD_THREADS - 1; i >= 0; --i)
+		
+		for(int i = currentMaxChunkRebuildsThread - 1; i >= 0; --i)
 		{
 			// Set the events that won't run
 			if( (i+1) > index) s_rebuildCompleteEvents->Set(i);
@@ -2470,6 +2479,18 @@ void LevelRenderer::setForceDirtyChunkCheckPeriod(unsigned int ms)
 	app.DebugPrintf("Changed chunk force dirty chunk update to %dms",ms);
 	this->forceDirtyChunkCheckPeriodMs = ms;
 }
+
+void LevelRenderer::setMaxChunkRebuild(unsigned int max)
+{
+	if (max > MAX_CONCURRENT_CHUNK_REBUILDS) max = MAX_CONCURRENT_CHUNK_REBUILDS;
+	if (max < MIN_CONCURRENT_CHUNK_REBUILDS) max = MAX_CONCURRENT_CHUNK_REBUILDS;
+
+	currentMaxConcurrentChunkRebuilds = max;
+	currentMaxChunkRebuildsThread = max-1;
+
+	app.DebugPrintf("Set max chunk rebuild to %d and max rebuild threads to %d\n", currentMaxConcurrentChunkRebuilds, currentMaxChunkRebuildsThread);
+}
+
 
 bool inline clip(float *bb, float *frustum)
 {
@@ -3724,9 +3745,16 @@ void LevelRenderer::DestroyedTileManager::tick()
 #ifdef _LARGE_WORLDS
 void LevelRenderer::staticCtor()
 {
-	s_rebuildCompleteEvents = new C4JThread::EventArray(MAX_CHUNK_REBUILD_THREADS);
+	rebuildThreads.reserve(currentMaxChunkRebuildsThread);
+	rebuildThreads.resize(currentMaxChunkRebuildsThread);
+	permaChunk.reserve(currentMaxConcurrentChunkRebuilds);
+	permaChunk.resize(currentMaxConcurrentChunkRebuilds);
+	s_activationEventA.reserve(currentMaxChunkRebuildsThread);
+	s_activationEventA.resize(currentMaxChunkRebuildsThread);
+
+	s_rebuildCompleteEvents = new C4JThread::EventArray(currentMaxChunkRebuildsThread);
 	char threadName[256];
-	for(unsigned int i = 0; i < MAX_CHUNK_REBUILD_THREADS; ++i)
+	for(unsigned int i = 0; i < currentMaxChunkRebuildsThread; ++i)
 	{
 		sprintf(threadName,"Rebuild Chunk Thread %d\n",i);
 		rebuildThreads[i] = new C4JThread(rebuildChunkThreadProc,(void *)i,threadName);

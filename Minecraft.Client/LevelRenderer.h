@@ -179,9 +179,9 @@ private:
 	double yOld[4];						// 4J - now one per player
 	double zOld[4];						// 4J - now one per player
 
-	unsigned int maxCommandBufferMemory = MIN_COMMANDBUFFER_ALLOCATIONS;
-	unsigned int nearDistance = MAX_NEAR_DISTANCE;
-	unsigned int forceDirtyChunkCheckPeriodMs = MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+	unsigned int maxCommandBufferMemory = MAX_COMMANDBUFFER_ALLOCATIONS;
+	unsigned int nearDistance = MIN_NEAR_DISTANCE;
+	unsigned int forceDirtyChunkCheckPeriodMs = MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
 
 	int totalChunks, offscreenChunks, occludedChunks, renderedChunks, emptyChunks;
 	static const int RENDERLISTS_LENGTH = 4;		// 4J - added
@@ -288,31 +288,36 @@ public:
 
 	bool				dirtyChunkPresent;
 	int64_t				lastDirtyChunkFound;
-	// switched to custom value instead of a const -updated by TheLordWolf 
+	// switched to custom value instead of a const - updated by TheLordWolf 
 	// static const int	FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125; // decreased from 250 to 125 - updated by detectiveren
 	static const int    MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125;
 	static const int    MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 250;
 
 
 #ifdef _LARGE_WORLDS
-	//chunk-memory todo switch the arrays to a vector so we can use custom value for the max number of concurrent chunk rebuilds
-	static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8; // increased from 4 to 8 - updated by detectiveren
-	static const int MAX_CHUNK_REBUILD_THREADS = MAX_CONCURRENT_CHUNK_REBUILDS - 1;
-	static Chunk permaChunk[MAX_CONCURRENT_CHUNK_REBUILDS];
-	static C4JThread *rebuildThreads[MAX_CHUNK_REBUILD_THREADS];
-	static C4JThread::EventArray *s_rebuildCompleteEvents;
-	static C4JThread::Event *s_activationEventA[MAX_CHUNK_REBUILD_THREADS];
 	
-	//static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8;
-	//static const int MIN_CONCURRENT_CHUNK_REBUILDS = 4;
+	//switched to a (launch args) custom value for the max chunk rebuilds, and switched the arrays to vectors - updated by TheLordWolf
+	//static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8; // increased from 4 to 8 - updated by detectiveren
 	//static const int MAX_CHUNK_REBUILD_THREADS = MAX_CONCURRENT_CHUNK_REBUILDS - 1;
-	//unsigned int currentMaxConcurrentChunkRebuilds = MIN_CONCURRENT_CHUNK_REBUILDS;
-	//unsigned int currentMaxChunkRebuildsThread = MIN_CONCURRENT_CHUNK_REBUILDS - 1;
+	//static Chunk permaChunk[MAX_CONCURRENT_CHUNK_REBUILDS];
+	//static C4JThread *rebuildThreads[MAX_CHUNK_REBUILD_THREADS];
+	//static C4JThread::EventArray *s_rebuildCompleteEvents;
+	//static C4JThread::Event *s_activationEventA[MAX_CHUNK_REBUILD_THREADS];
+	
+	static const int MAX_CONCURRENT_CHUNK_REBUILDS = 8;
+	static const int MIN_CONCURRENT_CHUNK_REBUILDS = 4;
+	static const int MAX_CHUNK_REBUILD_THREADS = MAX_CONCURRENT_CHUNK_REBUILDS - 1;
+	static const int MIN_CHUNK_REBUILD_THREADS = MIN_CONCURRENT_CHUNK_REBUILDS - 1;
 
-	//static std::vector<Chunk> permaChunk;
-	//static std::vector <C4JThread*> rebuildThreads;
-	//static C4JThread::EventArray* s_rebuildCompleteEvents;
-	//static std::vector<C4JThread::Event*> s_activationEventA;
+	static unsigned int currentMaxConcurrentChunkRebuilds;
+	static unsigned int currentMaxChunkRebuildsThread;
+
+	static std::vector<Chunk> permaChunk;
+	static std::vector <C4JThread*> rebuildThreads;
+	static C4JThread::EventArray* s_rebuildCompleteEvents;
+	static std::vector<C4JThread::Event*> s_activationEventA;
+
+	static void setMaxChunkRebuild(unsigned int max);
 
 	static void staticCtor();
 	static int rebuildChunkThreadProc(LPVOID lpParam);
