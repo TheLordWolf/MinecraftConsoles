@@ -1420,9 +1420,10 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_ChunkCommandBufferMem:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
-			std::string str = "chunk-memory alloc : " + std::to_string(GameSettingsA[iPad]->ucChunkAllocatedMem*1024*1024*128) + "\n";
+			unsigned int memMB = LevelRenderer::chunkMaxMemToBytes(GameSettingsA[iPad]->ucChunkAllocatedMem);
+			std::string str = "chunk-memory alloc : " + std::to_string(memMB) + "\n";
 			app.DebugPrintf(str.c_str());
-			pMinecraft->levelRenderer->setMaxCommandBufferMemory(GameSettingsA[iPad]->ucChunkAllocatedMem*1024*1024*128);
+			pMinecraft->levelRenderer->setMaxCommandBufferMemory(memMB);
 			pMinecraft->options->set(Options::Option::CHUNK_ALLOCATED_MEM, static_cast<float>(GameSettingsA[iPad]->ucChunkAllocatedMem));
 		}
 		break;

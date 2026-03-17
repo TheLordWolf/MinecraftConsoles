@@ -2490,7 +2490,14 @@ void LevelRenderer::setMaxChunkRebuild(unsigned int max)
 
 	app.DebugPrintf("Set max chunk rebuild to %d and max rebuild threads to %d\n", currentMaxConcurrentChunkRebuilds, currentMaxChunkRebuildsThread);
 }
-
+unsigned int LevelRenderer::chunkMaxMemToBytes(unsigned char ucChunk)
+{
+	return static_cast<unsigned int>(ucChunk) * 1024 * 1024 * 128;
+}
+unsigned char LevelRenderer::bytesToChunkMaxMem(unsigned int bytes)
+{
+	return static_cast<unsigned char>(bytes / 1024 / 1024 / 128);
+}
 
 bool inline clip(float *bb, float *frustum)
 {

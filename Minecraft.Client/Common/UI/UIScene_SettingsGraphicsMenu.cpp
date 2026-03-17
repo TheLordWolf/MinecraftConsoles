@@ -86,8 +86,8 @@ UIScene_SettingsGraphicsMenu::UIScene_SettingsGraphicsMenu(int iPad, void *initD
 	if (allocatedVal > LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS)
 		allocatedVal = LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS;
 
-	constexpr unsigned int MIN_COMMAND_BUFFER_MB = LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024 / 128;
-	constexpr unsigned int MAX_COMMAND_BUFFER_MB = LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS / 1024 / 1024 / 128;
+	const unsigned int MIN_COMMAND_BUFFER_MB = LevelRenderer::bytesToChunkMaxMem(LevelRenderer::MIN_COMMANDBUFFER_ALLOCATIONS);
+	const unsigned int MAX_COMMAND_BUFFER_MB = LevelRenderer::bytesToChunkMaxMem(LevelRenderer::MAX_COMMANDBUFFER_ALLOCATIONS);
 	swprintf(TempString, 256, L"mem: %dMB", allocatedVal*128);
 	m_sliderChunkCommandBufferMem.init(TempString, eControl_ChunkCommandBufferMem, MIN_COMMAND_BUFFER_MB, MAX_COMMAND_BUFFER_MB, allocatedVal);
 

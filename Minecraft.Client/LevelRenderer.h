@@ -318,6 +318,8 @@ public:
 	static std::vector<C4JThread::Event*> s_activationEventA;
 
 	static void setMaxChunkRebuild(unsigned int max);
+	static unsigned int chunkMaxMemToBytes(unsigned char ucChunk);
+	static unsigned char bytesToChunkMaxMem(unsigned int bytes);
 
 	static void staticCtor();
 	static int rebuildChunkThreadProc(LPVOID lpParam);
