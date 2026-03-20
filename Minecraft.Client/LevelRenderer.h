@@ -53,7 +53,7 @@ public:
 #endif
 	static const int CHUNK_Y_COUNT = Level::maxBuildHeight / CHUNK_SIZE;
 #if defined _WINDOWS64
-	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 2047 * 1024 * 1024;	// Changed to 2047. 4J had set to 512.
+	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 2048 * 1024 * 1024;	// Changed to 2047. 4J had set to 512.
 	static const int MIN_COMMANDBUFFER_ALLOCATIONS = 512 * 1024 * 1024;
 #elif defined _XBOX_ONE
 	static const int MAX_COMMANDBUFFER_ALLOCATIONS = 512 * 1024 * 1024;		// 4J - added
@@ -293,7 +293,6 @@ public:
 	static const int    MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 125;
 	static const int    MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS = 250;
 
-
 #ifdef _LARGE_WORLDS
 	
 	//switched to a (launch args) custom value for the max chunk rebuilds, and switched the arrays to vectors - updated by TheLordWolf
@@ -318,8 +317,15 @@ public:
 	static std::vector<C4JThread::Event*> s_activationEventA;
 
 	static void setMaxChunkRebuild(unsigned int max);
-	static unsigned int chunkMaxMemToBytes(unsigned char ucChunk);
-	static unsigned char bytesToChunkMaxMem(unsigned int bytes);
+	
+	static unsigned int ucCommandBufferToBytes(unsigned char ucChunk);
+	static unsigned char bytesToUcCommandBuffer(unsigned int bytes);
+	
+	static unsigned int ucNearToNearDistance(unsigned char ucDistance);
+	static unsigned int nearDistanceToNearUc(unsigned char distance);
+
+	static unsigned int ucUpdateMSToUpdateMS(unsigned char ucUpdate);
+	static unsigned int updateMSToUcUpdateMS(unsigned char update);
 
 	static void staticCtor();
 	static int rebuildChunkThreadProc(LPVOID lpParam);

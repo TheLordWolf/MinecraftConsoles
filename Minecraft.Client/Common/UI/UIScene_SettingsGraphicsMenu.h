@@ -59,4 +59,5 @@ public:
 	static int LevelToDistance(int dist);
 
 	static int DistanceToLevel(int dist);
+
 };

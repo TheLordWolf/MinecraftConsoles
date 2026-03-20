@@ -2490,13 +2490,48 @@ void LevelRenderer::setMaxChunkRebuild(unsigned int max)
 
 	app.DebugPrintf("Set max chunk rebuild to %d and max rebuild threads to %d\n", currentMaxConcurrentChunkRebuilds, currentMaxChunkRebuildsThread);
 }
-unsigned int LevelRenderer::chunkMaxMemToBytes(unsigned char ucChunk)
+unsigned int LevelRenderer::ucCommandBufferToBytes(unsigned char ucChunk)
 {
-	return static_cast<unsigned int>(ucChunk) * 1024 * 1024 * 128;
+	if (ucChunk < 0) ucChunk = 0;
+	if (ucChunk > 100) ucChunk = 100;
+
+	return (MAX_COMMANDBUFFER_ALLOCATIONS - MIN_COMMANDBUFFER_ALLOCATIONS) * (ucChunk / 100.0f) + MIN_COMMANDBUFFER_ALLOCATIONS;
 }
-unsigned char LevelRenderer::bytesToChunkMaxMem(unsigned int bytes)
+unsigned char LevelRenderer::bytesToUcCommandBuffer(unsigned int bytes)
 {
-	return static_cast<unsigned char>(bytes / 1024 / 1024 / 128);
+	if (bytes < MIN_COMMANDBUFFER_ALLOCATIONS) bytes = MIN_COMMANDBUFFER_ALLOCATIONS;
+	if (bytes > MAX_COMMANDBUFFER_ALLOCATIONS) bytes = MAX_COMMANDBUFFER_ALLOCATIONS;
+
+	return ((bytes - MIN_COMMANDBUFFER_ALLOCATIONS) * 100) / (MAX_COMMANDBUFFER_ALLOCATIONS - MIN_COMMANDBUFFER_ALLOCATIONS);
+}
+
+unsigned int LevelRenderer::ucNearToNearDistance(unsigned char ucDistance)
+{
+	if (ucDistance < 0) ucDistance = 0;
+	if (ucDistance > 100) ucDistance = 100;
+
+	return (MAX_NEAR_DISTANCE - MIN_NEAR_DISTANCE) * (ucDistance / 100.0f) + MIN_NEAR_DISTANCE;
+}
+unsigned int LevelRenderer::nearDistanceToNearUc(unsigned char distance)
+{
+	if (distance < MIN_NEAR_DISTANCE) distance = MIN_NEAR_DISTANCE;
+	if (distance > MAX_NEAR_DISTANCE) distance = MAX_NEAR_DISTANCE;
+
+	return ((distance - MIN_NEAR_DISTANCE) * 100) / (MAX_NEAR_DISTANCE - MIN_NEAR_DISTANCE);
+}
+unsigned int LevelRenderer::ucUpdateMSToUpdateMS(unsigned char ucUpdate) 
+{
+	if (ucUpdate < 0) ucUpdate = 0;
+	if (ucUpdate > 100) ucUpdate = 100;
+
+	return (MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS - MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) * (ucUpdate / 100.0f) + MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+}
+unsigned int LevelRenderer::updateMSToUcUpdateMS(unsigned char update)
+{
+	if (update < MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) update = MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+	if (update > MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) update = MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS;
+
+	return ((update - MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS) * 100) / (MAX_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS - MIN_FORCE_DIRTY_CHUNK_CHECK_PERIOD_MS);
 }
 
 bool inline clip(float *bb, float *frustum)

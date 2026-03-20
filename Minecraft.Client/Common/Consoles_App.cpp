@@ -1420,7 +1420,7 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_ChunkCommandBufferMem:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
-			unsigned int memMB = LevelRenderer::chunkMaxMemToBytes(GameSettingsA[iPad]->ucChunkAllocatedMem);
+			unsigned int memMB = LevelRenderer::ucCommandBufferToBytes(GameSettingsA[iPad]->ucChunkAllocatedMem);
 			std::string str = "chunk-memory alloc : " + std::to_string(memMB) + "\n";
 			app.DebugPrintf(str.c_str());
 			pMinecraft->levelRenderer->setMaxCommandBufferMemory(memMB);
@@ -1430,18 +1430,20 @@ void CMinecraftApp::ActionGameSettings(int iPad,eGameSetting eVal)
 	case eGameSetting_ChunkNearDistance:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
-			std::string str = "chunk-distance : " + std::to_string(GameSettingsA[iPad]->ucChunkNearDistance) + "\n";
+			const unsigned int nearDistance = LevelRenderer::ucNearToNearDistance(GameSettingsA[iPad]->ucChunkNearDistance);
+			std::string str = "chunk-distance : " + std::to_string(nearDistance) + "\n";
 			app.DebugPrintf(str.c_str());
-			pMinecraft->levelRenderer->setNearDistance(GameSettingsA[iPad]->ucChunkNearDistance);
+			pMinecraft->levelRenderer->setNearDistance(nearDistance);
 			pMinecraft->options->set(Options::Option::CHUNK_NEAR_DISTANCE, static_cast<float>(GameSettingsA[iPad]->ucChunkNearDistance));
 		}
 		break;
 	case eGameSetting_ChunkForceUpdatePeriodMS:
 		if (iPad == ProfileManager.GetPrimaryPad())
 		{
-			std::string str = "chunk-force : " + std::to_string(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS) + "\n";
+			const unsigned int forceUpdate = LevelRenderer::ucUpdateMSToUpdateMS(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS);
+			std::string str = "chunk-force : " + std::to_string(forceUpdate) + "\n";
 			app.DebugPrintf(str.c_str());
-			pMinecraft->levelRenderer->setForceDirtyChunkCheckPeriod(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS);
+			pMinecraft->levelRenderer->setForceDirtyChunkCheckPeriod(forceUpdate);
 			pMinecraft->options->set(Options::Option::CHUNK_FORCE_UPDATE_PERIOD_MS, static_cast<float>(GameSettingsA[iPad]->ucChunkForceUpdatePeriodMS));
 		}
 		break;
